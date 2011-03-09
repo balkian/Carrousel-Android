@@ -23,6 +23,7 @@ public class Configuration extends ListActivity {
         super.onCreate(savedInstanceState);
         intent = new Intent(getBaseContext(), Results.class);
         startService(intent);
+        setContentView(R.layout.main);
         ServiceConnection conn = new ServiceConnection() {
         	@Override
         	public void onServiceConnected(ComponentName className, IBinder service) {

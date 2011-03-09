@@ -1,7 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    />
+    android:layout_width="match_parent" 
+    android:layout_height="match_parent">
+    <FrameLayout
+        android:layout_width="match_parent" 
+        android:layout_height="0dip"
+        android:layout_weight="1" >
+        <ListView android:id="@android:id/list"
+            android:layout_width="match_parent" 
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="false"/>
+    </FrameLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_height="wrap_content" android:layout_width="match_parent">
 
+        <Button android:id="@+id/subscribe"
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content"
+            android:text="Subscribe to selected matches"/>
+
+        <Button android:id="@+id/quit"
+            android:layout_height="wrap_content"
+            android:text="Quit" android:layout_width="wrap_content"/>
+    </LinearLayout>
+</LinearLayout>
