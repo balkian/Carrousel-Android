@@ -1,5 +1,6 @@
 package com.onirica.carrousel;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -25,13 +26,30 @@ public class Results extends Service {
          pollingTask task = new pollingTask();
          Timer timer = new Timer(true);
          timer.scheduleAtFixedRate(task, 0, 60000);
-  }
+    }
+    
+    public ArrayList<Match> getMatches() {
+    	ArrayList<Match> matches = new ArrayList<Match>();
+    	
+    	Match match = new Match("Deportivo", "Atelico de Madrid");
+    	matches.add(match);
+    	
+    	match = new Match("Betis", "Sevilla");
+    	matches.add(match);
+    	
+    	match = new Match("Madrid", "Barcelona", Match.State.MATCH_FIRST_ROUND, 13);
+    	Match.Goal goal = match.new Goal(12, true, "Cristiano Ronaldo");
+    	match.addGoal(goal);
+    	matches.add(match);
+    	
+    	return matches;
+    }
 	
-	private class pollingTask extends TimerTask {
+    private class pollingTask extends TimerTask {
 		  @Override
 		  public void run() {
 		  // Aqui descargaremos los resultados
 		  }
-		}
+	}
 
 }
