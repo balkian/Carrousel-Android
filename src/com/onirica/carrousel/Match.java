@@ -47,4 +47,24 @@ public class Match {
 		goals.add(goal);
 	}
 	
+	public int getLocalGoals() {
+		int count = 0;
+		for (Goal g : goals)
+			if (g.isLocal)
+				count++;
+		return count;
+		}
+	
+	public int getVisitorGoals() {
+		int count = 0;
+		for (Goal g : goals)
+			if (!g.isLocal)
+					count++;
+		return count;
+	}
+	
+	public String toString() {
+		return localTeam + " " + getLocalGoals() + " - " + getVisitorGoals() + " " + visitorTeam;
+	}
+	
 }

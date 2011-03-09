@@ -3,6 +3,7 @@ package com.onirica.carrousel;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
@@ -10,8 +11,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.widget.ArrayAdapter;
 
-public class Configuration extends Activity {
+public class Configuration extends ListActivity {
     private Results mResults;
     private Intent intent;
     private ProgressDialog progressDialog;
@@ -19,7 +21,6 @@ public class Configuration extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
         intent = new Intent(getBaseContext(), Results.class);
         startService(intent);
         ServiceConnection conn = new ServiceConnection() {
@@ -53,5 +54,10 @@ public class Configuration extends Activity {
     }
     private void populateMatches() {
     	ArrayList<Match> matches = mResults.getMatches();
+    	Match[] ms = new Match[matches.size()]; 
+    	matches.toArray(ms);
+    	ArrayAdapter<Match> adapter = new ArrayAdapter<Match>(this, R.layout.list_item, ms);
+    	setListAdapter(adapter);	
+    	
     }
 }
