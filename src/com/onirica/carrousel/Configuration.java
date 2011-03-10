@@ -44,6 +44,11 @@ public class Configuration extends ListActivity {
         	@Override
         	public void onServiceConnected(ComponentName className, IBinder service) {
         		 mResults = ((Results.LocalBinder)service).getService();
+        		 subscribedMatches = mResults.getSubscriptions();
+         		 if (subscribedMatches == null) {
+         			subscribedMatches = new HashSet<String>();
+         		 } else 
+         		    mSubscribeButton.setEnabled(true);
         		 populateMatches();
         		 progressDialog.dismiss();
         		 
@@ -106,12 +111,13 @@ public class Configuration extends ListActivity {
 		private CheckBox mCb;
 		private CompoundButton.OnCheckedChangeListener mListener = null;
 		
-		public MatchView(Context context, String text) {
+		public MatchView(Context context, String text, boolean isChecked) {
 			super(context);
 			this.setOrientation(HORIZONTAL);
 			mTv = new TextView(context);
 			mTv.setText(text);
 			mCb = new CheckBox(context);
+			setChecked(isChecked);
 			mCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 						if (mListener != null) {
@@ -125,6 +131,10 @@ public class Configuration extends ListActivity {
 		
 		public void setText(String text) {
 			mTv.setText(text);
+		}
+		
+		public void setChecked(boolean isChecked) {
+			mCb.setChecked(isChecked);
 		}
 		
 		public void setOnMatchCheckedChanged(CompoundButton.OnCheckedChangeListener listener) {
@@ -152,14 +162,25 @@ public class Configuration extends ListActivity {
 		public long getItemId(int pos) {
 			return pos;
 		}
+		@Override
 		public View getView(int pos, View convertView, ViewGroup parent) {
 			MatchView v;
+			Match match = mMatches[pos];
+			boolean isSubscribed = subscribedMatches.contains(match.getId());
+			
 			if (convertView == null) {
-				v = new MatchView(parent.getContext(), mMatches[pos].toString());
+;				v = new MatchView(parent.getContext(), match.toString(), isSubscribed);
 				v.setOnMatchCheckedChanged(new OnMatchCheckedListener(pos));
 			} else {
 				v = (MatchView)convertView;
-				v.setText(mMatches[pos].toString());
+				v.setText(match.toString());
+				// This is tricky: We are reusing the view for a different match.
+				// We need to update the view checkbox state and we use setChecked, 
+				// but this would trigger the previous event listener, clearing 
+				// the model of the previous item shown with this view.
+				v.setOnMatchCheckedChanged(null);
+				v.setChecked(isSubscribed);
+				v.setOnMatchCheckedChanged(new OnMatchCheckedListener(pos));
 			}
 			return v;
 		}
@@ -173,9 +194,10 @@ public class Configuration extends ListActivity {
 	        	Match m = (Match)getItem(mPosition);
 	         	if (m != null) {
 	         		if (isChecked)
-	    	        	subscribedMatches.remove(mMatches[mPosition].getId());
-	    		    else
 	    	        	subscribedMatches.add(mMatches[mPosition].getId());
+	    		    else
+	    	        	subscribedMatches.remove(mMatches[mPosition].getId());
+	         		mSubscribeButton.setEnabled(!subscribedMatches.isEmpty());
 	    	    }
 	        }   
 	        

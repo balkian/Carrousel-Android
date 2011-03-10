@@ -23,6 +23,11 @@ public class Results extends Service {
 	public void updateSubscriptions(HashSet<String> subscriptions) {
 	    	mSubscriptions = subscriptions;
 	}
+	
+	public HashSet<String> getSubscriptions() {
+	   	return mSubscriptions;
+	}
+
 
     public class LocalBinder extends Binder {
       Results getService() {
