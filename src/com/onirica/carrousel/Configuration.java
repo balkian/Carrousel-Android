@@ -1,6 +1,8 @@
 package com.onirica.carrousel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import android.app.Activity;
 import android.app.ListActivity;
@@ -13,9 +15,11 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -24,7 +28,11 @@ import android.widget.TextView;
 public class Configuration extends ListActivity {
     private Results mResults;
     private Intent intent;
+    private ServiceConnection conn;
     private ProgressDialog progressDialog;
+    private HashSet<String> subscribedMatches  = new HashSet<String>();
+    private Button mSubscribeButton;
+    
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,7 +40,7 @@ public class Configuration extends ListActivity {
         intent = new Intent(getBaseContext(), Results.class);
         startService(intent);
         setContentView(R.layout.main);
-        ServiceConnection conn = new ServiceConnection() {
+        conn = new ServiceConnection() {
         	@Override
         	public void onServiceConnected(ComponentName className, IBinder service) {
         		 mResults = ((Results.LocalBinder)service).getService();
@@ -60,12 +68,36 @@ public class Configuration extends ListActivity {
                 }
             });
        progressDialog.show();
+       Button b = (Button) findViewById(R.id.quit);
+       b.setOnClickListener(new OnClickListener() {
+       	public void onClick(View v) {
+       		stopService(intent);
+       		quit();
+       	} 
+		});
+       
+       mSubscribeButton = (Button) findViewById(R.id.subscribe);
+       mSubscribeButton.setOnClickListener(new OnClickListener() {
+       	public void onClick(View v) {
+       		mResults.updateSubscriptions(subscribedMatches);
+       		close();
+       	} 
+		});
     }
+    private void close() {
+    	unbindService(conn);
+    	finish();
+    }
+    
+    private void quit() {
+    	unbindService(conn);
+    	stopService(intent);
+    	finish();
+    }
+    
     private void populateMatches() {
-    	ArrayList<Match> matches = mResults.getMatches();
-    	Match[] ms = new Match[matches.size()]; 
-    	matches.toArray(ms);
-    	MatchAdapter adapter = new MatchAdapter(ms);
+    	HashMap<String, Match> matches = mResults.getMatches();
+    	MatchAdapter adapter = new MatchAdapter((Match[])matches.values().toArray(new Match[0]));
     	setListAdapter(adapter);
     }
     
@@ -138,7 +170,13 @@ public class Configuration extends ListActivity {
 	        }
 	        @Override
 	        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-	        	// Do the real stuff here.
+	        	Match m = (Match)getItem(mPosition);
+	         	if (m != null) {
+	         		if (isChecked)
+	    	        	subscribedMatches.remove(mMatches[mPosition].getId());
+	    		    else
+	    	        	subscribedMatches.add(mMatches[mPosition].getId());
+	    	    }
 	        }   
 	        
 		}

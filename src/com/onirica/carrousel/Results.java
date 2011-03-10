@@ -1,6 +1,8 @@
 package com.onirica.carrousel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -11,6 +13,16 @@ import android.os.IBinder;
 
 public class Results extends Service {
 	private final IBinder mBinder = new LocalBinder();
+	private HashMap<String, Match> mMatches = new HashMap<String, Match>();
+	private HashSet<String> mSubscriptions = null;
+	
+	public HashMap<String, Match> getMatches() {
+    	return mMatches;
+    }
+	
+	public void updateSubscriptions(HashSet<String> subscriptions) {
+	    	mSubscriptions = subscriptions;
+	}
 
     public class LocalBinder extends Binder {
       Results getService() {
@@ -19,6 +31,8 @@ public class Results extends Service {
     }
 	@Override
 	public IBinder onBind(Intent arg0) {
+		if (mMatches.isEmpty())
+			mMatches = retrieveMatches();
 		return mBinder;
 	}
     @Override
@@ -28,22 +42,24 @@ public class Results extends Service {
          timer.scheduleAtFixedRate(task, 0, 60000);
     }
     
-    public ArrayList<Match> getMatches() {
-    	ArrayList<Match> matches = new ArrayList<Match>();
+    private HashMap<String, Match> retrieveMatches() {
+    	HashMap<String, Match> matches = new HashMap<String, Match>();
     	
-    	Match match = new Match("Deportivo", "Atelico de Madrid");
-    	matches.add(match);
+    	Match match = new Match("bbva1", "Deportivo", "Atelico de Madrid");
+    	matches.put(match.getId(), match);
     	
-    	match = new Match("Betis", "Sevilla");
-    	matches.add(match);
+    	match = new Match("bbva2", "Betis", "Sevilla");
+    	matches.put(match.getId(), match);
     	
-    	match = new Match("Madrid", "Barcelona", Match.State.MATCH_FIRST_ROUND, 13);
+    	match = new Match("bbva3", "Oviedo", "Sporting", Match.State.MATCH_SECOND_ROUND, 84);
+    	
+    	match = new Match("bbva13", "Madrid", "Barcelona", Match.State.MATCH_FIRST_ROUND, 13);
     	Match.Goal goal = match.new Goal(12, true, "Cristiano Ronaldo");
     	match.addGoal(goal);
-    	matches.add(match);
+    	matches.put(match.getId(), match);
     	
     	return matches;
-    }
+}
 	
     private class pollingTask extends TimerTask {
 		  @Override

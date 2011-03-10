@@ -25,9 +25,11 @@ public class Match {
 	public String visitorTeam;
 	public State state;
 	public int min;
+	public String id;
 	public ArrayList<Goal> goals;
 	
-	public Match(String localTeam, String visitorTeam) {
+	public Match(String id, String localTeam, String visitorTeam) {
+		this.id = id;
 		this.localTeam = localTeam;
 		this.visitorTeam = visitorTeam;
 		state = State.MATCH_NO_STARTED;
@@ -35,7 +37,8 @@ public class Match {
 		goals = new ArrayList<Goal>();
 	}
 	
-	public Match(String localTeam, String visitorTeam, State state, int min) {
+	public Match(String id, String localTeam, String visitorTeam, State state, int min) {
+		this.id = id;
 		this.localTeam = localTeam;
 		this.visitorTeam = visitorTeam;
 		this.state = state;
@@ -65,6 +68,10 @@ public class Match {
 	
 	public String toString() {
 		return localTeam + " " + getLocalGoals() + " - " + getVisitorGoals() + " " + visitorTeam;
+	}
+	
+	public String getId() {
+		return id;
 	}
 	
 }
