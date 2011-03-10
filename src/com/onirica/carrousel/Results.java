@@ -13,7 +13,11 @@ import java.util.TimerTask;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -23,6 +27,9 @@ public class Results extends Service {
 	private final IBinder mBinder = new LocalBinder();
 	private HashMap<String, Match> mMatches = new HashMap<String, Match>();
 	private HashSet<String> mSubscriptions = null;
+	private final String RESULTS_LOG = "Results";
+	private static final int SCORE_NOTIFICATION_ID = 1;
+	private NotificationManager mNM;
 	
 	public HashMap<String, Match> getMatches() {
     	return mMatches;
@@ -50,6 +57,7 @@ public class Results extends Service {
 	}
     @Override
     public void onCreate() {
+    	mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
          pollingTask task = new pollingTask();
          Timer timer = new Timer(true);
          timer.scheduleAtFixedRate(task, 0, 60000);
@@ -118,11 +126,59 @@ public class Results extends Service {
     	return matches;
     } 
 	
-    private class pollingTask extends TimerTask {
-		  @Override
-		  public void run() {
-		  // Aqui descargaremos los resultados
-		  }
+	private class pollingTask extends TimerTask {
+		@Override
+		public void run() {
+			Log.v(RESULTS_LOG, "running task");
+			if (mSubscriptions == null || mSubscriptions.isEmpty()) {
+				Log.v(RESULTS_LOG, "no subscriptions, exiting");
+				return;
+			}
+			Log.v(RESULTS_LOG, "Has " + mSubscriptions.size() + " subscriptions");
+			HashMap<String, Match> matches = retrieveMatches();
+			if (matches == null || matches.isEmpty())
+				return;
+				
+			for (String id : mSubscriptions ) {
+				if (matches.containsKey(id))
+					checkMatch(matches.get(id));
+			}
+			mMatches = matches;
+		}
+		private void checkMatch(Match match) {
+			if (match.getLocalGoals() > mMatches.get(match.getId()).getLocalGoals()) {
+				notifyGoal(match.getLocalTeam(),
+						   match.getLocalTeam(), match.getLocalGoals(),
+						   match.getVisitorTeam(), match.getVisitorGoals());
+			}
+			
+			if (match.getVisitorGoals() > mMatches.get(match.getId()).getVisitorGoals()) {
+				notifyGoal(match.getVisitorTeam(),
+						   match.getLocalTeam(), match.getLocalGoals(),
+						   match.getVisitorTeam(), match.getVisitorGoals());
+			}
+		}
+		
 	}
+	private void notifyGoal(String scoreTeam,
+            String localTeam, int localGoals,
+            String visitorTeam, int visitorGoals) {
+			String titleText = scoreTeam + " Scored!";
+			String contentText = scoreTeam + " Scored!\n" + localTeam + " " + localGoals + 
+              " - " + visitorTeam + " " + visitorGoals;
+			int icon = R.drawable.icon;
+			long when = System.currentTimeMillis();
+
+			Notification notification = new Notification(icon, titleText, when);
+			Context context = getApplicationContext();
+			Intent notificationIntent = new Intent(this, Results.class);
+			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+			notification.setLatestEventInfo(context, titleText, contentText, contentIntent);
+
+
+			mNM.notify(SCORE_NOTIFICATION_ID, notification);
+
+}
 
 }

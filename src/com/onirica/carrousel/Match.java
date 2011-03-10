@@ -74,4 +74,13 @@ public class Match {
 		return id;
 	}
 	
+	public String getLocalTeam() {
+		return localTeam;
+	}
+	
+	public String getVisitorTeam() {
+		return visitorTeam;
+	}
+	
+	
 }
