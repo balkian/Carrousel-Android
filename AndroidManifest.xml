@@ -15,6 +15,7 @@
             </intent-filter>
         </activity>
         <service android:name="Results"></service>
+        <activity android:name="SelectTeam"></activity>
 
     </application>
 </manifest>

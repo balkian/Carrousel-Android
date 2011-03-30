@@ -1,10 +1,8 @@
 package com.onirica.carrousel;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
@@ -14,10 +12,12 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -38,8 +38,9 @@ public class Configuration extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         intent = new Intent(getBaseContext(), Results.class);
-        startService(intent);
+        startService(intent);           
         setContentView(R.layout.main);
+        this.getWindow().setBackgroundDrawableResource(R.drawable.realmadrid);
         conn = new ServiceConnection() {
         	@Override
         	public void onServiceConnected(ComponentName className, IBinder service) {
@@ -89,7 +90,33 @@ public class Configuration extends ListActivity {
        	} 
 		});
     }
-    private void close() {
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.configuration_menu, menu);
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+        case R.id.select_team:
+            showSelect();
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }    
+    
+    private void showSelect() {
+    	//TODO
+		Intent intent = new Intent(this, SelectTeam.class);
+		startActivity(intent);
+    }
+
+	private void close() {
     	unbindService(conn);
     	finish();
     }
@@ -114,6 +141,8 @@ public class Configuration extends ListActivity {
 		public MatchView(Context context, String text, boolean isChecked) {
 			super(context);
 			this.setOrientation(HORIZONTAL);
+			this.setBackgroundColor(R.color.transparent);
+			
 			mTv = new TextView(context);
 			mTv.setText(text);
 			mCb = new CheckBox(context);
@@ -167,7 +196,9 @@ public class Configuration extends ListActivity {
 			MatchView v;
 			Match match = mMatches[pos];
 			boolean isSubscribed = subscribedMatches.contains(match.getId());
-			
+			if(match.localTeam.equals("Real Madrid")||match.visitorTeam.equals("Real Madrid")){
+				isSubscribed=true;
+			}
 			if (convertView == null) {
 ;				v = new MatchView(parent.getContext(), match.toString(), isSubscribed);
 				v.setOnMatchCheckedChanged(new OnMatchCheckedListener(pos));

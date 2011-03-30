@@ -10,16 +10,14 @@
         <ListView android:id="@android:id/list"
             android:layout_width="match_parent" 
             android:layout_height="match_parent"
-            android:drawSelectorOnTop="false"/>
+            android:drawSelectorOnTop="false"
+            android:cacheColorHint="#00000000"
+            />
     </FrameLayout>
     <LinearLayout
         android:orientation="horizontal"
         android:layout_height="wrap_content" android:layout_width="match_parent">
-
-        <Button android:id="@+id/subscribe"
-            android:layout_width="wrap_content" 
-            android:layout_height="wrap_content"
-            android:text="Subscribe to selected matches"/>
+        <Button android:layout_width="wrap_content" android:text="Subscribe to selected matches" android:layout_height="wrap_content" android:id="@+id/subscribe"></Button>
 
         <Button android:id="@+id/quit"
             android:layout_height="wrap_content"

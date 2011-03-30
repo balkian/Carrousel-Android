@@ -66,7 +66,7 @@ public class Results extends Service {
     private HashMap<String, Match> retrieveMatches() {
     	HashMap<String, Match> matches = new HashMap<String, Match>();
     	try {
-    		URL url = new URL("http://192.168.1.10/matches.json");
+    		URL url = new URL("http://www.eurielec.etsit.upm.es/~fherrera/matches.json");
     		URLConnection urlConnection = url.openConnection();
     		BufferedReader in = new BufferedReader(
                                 	new InputStreamReader(
